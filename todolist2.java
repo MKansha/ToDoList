@@ -2,17 +2,20 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+// Task class represents a task with description, completion status, and due date
 class Task {
     private String description;
     private boolean completed;
     private Date dueDate;
 
+    // Constructor to initialize a task with description and due date
     public Task(String description, Date dueDate) {
         this.description = description;
         this.completed = false;
         this.dueDate = dueDate;
     }
 
+    // Getter methods for task attributes
     public String getDescription() {
         return description;
     }
@@ -33,6 +36,7 @@ class Task {
         return dueDate;
     }
 
+    // toString method to represent the task as a string
     @Override
     public String toString() {
         String status = completed ? "Completed" : "Pending";
@@ -41,6 +45,7 @@ class Task {
         return description + " - " + status + ", Due: " + formattedDate;
     }
 
+    // equals and hashCode methods for task comparison
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -55,24 +60,22 @@ class Task {
     }
 }
 
+// todolist2 class manages a list of tasks without undo and redo functionality
 public class todolist2 {
     private List<Task> tasks;
-    private Deque<List<Task>> undoStack;
-    private Deque<List<Task>> redoStack;
 
+    // Constructor to initialize the task list
     public todolist2() {
         tasks = new ArrayList<>();
-        undoStack = new LinkedList<>();
-        redoStack = new LinkedList<>();
     }
 
+    // Method to add tasks to the list
     public void addTasks(List<Task> newTasks) {
-        saveState(); // Save state before making changes
         tasks.addAll(newTasks);
     }
 
+    // Method to mark a task as completed
     public void markTaskCompleted(String description) {
-        saveState(); // Save state before making changes
         for (Task task : tasks) {
             if (task.getDescription().equals(description)) {
                 task.markCompleted();
@@ -83,8 +86,8 @@ public class todolist2 {
         System.out.println("Task not found.");
     }
 
+    // Method to delete a task
     public void deleteTask(String description) {
-        saveState(); // Save state before making changes
         if (tasks.removeIf(task -> task.getDescription().equals(description))) {
             System.out.println("Successfully deleted task.");
         } else {
@@ -92,6 +95,7 @@ public class todolist2 {
         }
     }
 
+    // Methods to get different sets of tasks
     public List<Task> getAllTasks() {
         return tasks;
     }
@@ -116,31 +120,7 @@ public class todolist2 {
         return pendingTasks;
     }
 
-    public void undo() {
-        if (!undoStack.isEmpty()) {
-            redoStack.push(new ArrayList<>(tasks)); // Save the current state for redo
-            tasks = new ArrayList<>(undoStack.pop()); // Restore the previous state
-            System.out.println("Undo successful.");
-        } else {
-            System.out.println("Undo not available.");
-        }
-    }
-
-    public void redo() {
-        if (!redoStack.isEmpty()) {
-            undoStack.push(new ArrayList<>(tasks)); // Save the current state for undo
-            tasks = new ArrayList<>(redoStack.pop()); // Restore the next state
-            System.out.println("Redo successful.");
-        } else {
-            System.out.println("Redo not available.");
-        }
-    }
-
-    private void saveState() {
-        undoStack.push(new ArrayList<>(tasks)); // Save the current state for undo
-        redoStack.clear(); // Clear redo stack when a new action is performed
-    }
-
+    // Main method for user interaction
     public static void main(String[] args) {
         todolist2 manager = new todolist2();
         Scanner scanner = new Scanner(System.in);
@@ -152,9 +132,7 @@ public class todolist2 {
             System.out.println("4. View All Tasks");
             System.out.println("5. View Completed Tasks");
             System.out.println("6. View Pending Tasks");
-            System.out.println("7. Undo");
-            System.out.println("8. Redo");
-            System.out.println("9. Exit");
+            System.out.println("7. Exit");
             System.out.print("Select an option: ");
             int option = scanner.nextInt();
             scanner.nextLine(); // Consume the newline character
@@ -219,12 +197,6 @@ public class todolist2 {
                     displayTasks("Pending Tasks", pendingTasks);
                     break;
                 case 7:
-                    manager.undo();
-                    break;
-                case 8:
-                    manager.redo();
-                    break;
-                case 9:
                     System.out.println("Goodbye!");
                     System.exit(0);
                 default:
@@ -233,6 +205,7 @@ public class todolist2 {
         }
     }
 
+    // Method to display tasks
     private static void displayTasks(String title, List<Task> tasks) {
         System.out.println("\n" + title + ":");
         if (tasks.isEmpty()) {
