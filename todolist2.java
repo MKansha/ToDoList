@@ -1,5 +1,3 @@
-package k;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -78,14 +76,20 @@ public class todolist2 {
         for (Task task : tasks) {
             if (task.getDescription().equals(description)) {
                 task.markCompleted();
+                System.out.println("Successfully marked task as completed.");
                 return;
             }
         }
+        System.out.println("Task not found.");
     }
 
     public void deleteTask(String description) {
         saveState(); // Save state before making changes
-        tasks.removeIf(task -> task.getDescription().equals(description));
+        if (tasks.removeIf(task -> task.getDescription().equals(description))) {
+            System.out.println("Successfully deleted task.");
+        } else {
+            System.out.println("Task not found.");
+        }
     }
 
     public List<Task> getAllTasks() {
@@ -116,6 +120,7 @@ public class todolist2 {
         if (!undoStack.isEmpty()) {
             redoStack.push(new ArrayList<>(tasks)); // Save the current state for redo
             tasks = new ArrayList<>(undoStack.pop()); // Restore the previous state
+            System.out.println("Undo successful.");
         } else {
             System.out.println("Undo not available.");
         }
@@ -125,6 +130,7 @@ public class todolist2 {
         if (!redoStack.isEmpty()) {
             undoStack.push(new ArrayList<>(tasks)); // Save the current state for undo
             tasks = new ArrayList<>(redoStack.pop()); // Restore the next state
+            System.out.println("Redo successful.");
         } else {
             System.out.println("Redo not available.");
         }
@@ -163,27 +169,33 @@ public class todolist2 {
                         taskDescription = taskDescription.trim();
                         if (!taskDescription.isEmpty()) {
                             while (true) {
-                                System.out.print("Enter due date for '" + taskDescription + "' (yyyy-MM-dd): ");
+                                System.out.print("Enter due date for '" + taskDescription + "' (yyyy-MM-dd or 'today'): ");
                                 String dueDateStr = scanner.nextLine();
                                 try {
-                                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                                    dateFormat.setLenient(false); // Make date validation strict
-                                    Date dueDate = dateFormat.parse(dueDateStr);
-                                    Date currentDate = new Date();
-                                    if (dueDate.after(currentDate)) {
-                                        newTasks.add(new Task(taskDescription, dueDate));
-                                        break; // Valid date, exit the loop
+                                    Date dueDate;
+                                    if (dueDateStr.equalsIgnoreCase("today")) {
+                                        dueDate = new Date(); // Set the due date to today
                                     } else {
-                                        System.out.println("Due date cannot be in the past.");
+                                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                        dateFormat.setLenient(false); // Make date validation strict
+                                        dueDate = dateFormat.parse(dueDateStr);
+                                        Date currentDate = new Date();
+                                        if (dueDate.before(currentDate)) {
+                                            System.out.println("Due date cannot be in the past.");
+                                            continue; // Continue the loop to re-enter the date
+                                        }
                                     }
+                                    newTasks.add(new Task(taskDescription, dueDate));
+                                    break; // Valid date, exit the loop
                                 } catch (ParseException e) {
-                                    System.out.println("Invalid date format or invalid date. Please use the format 'yyyy-MM-dd' and ensure the date is valid.");
+                                    System.out.println("Invalid date format or invalid date. Please use the format 'yyyy-MM-dd' or 'today' and ensure the date is valid.");
                                 }
                             }
                         }
                     }
                     manager.addTasks(newTasks);
-                    break;
+                    System.out.println("Successfully added task(s).");
+                    break; // Valid date, exit the loop
                 case 2:
                     System.out.print("Enter task description to mark as completed: ");
                     String completedDescription = scanner.nextLine();
