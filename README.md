@@ -1,6 +1,6 @@
 # Todo List Manager
 
-This Java program is a simple Todo List Manager that allows you to add tasks, mark tasks as completed, delete tasks, and more.
+This Java program is a simple Todo List Manager that allows you to add tasks, mark tasks as completed, delete tasks, and more.(Console based application).
 
 ## Features
 
